@@ -1,0 +1,47 @@
+@Library('github.com/releaseworks/jenkinslib') _
+
+pipeline {
+    agent any
+    environment {
+        registry = '616312837040.dkr.ecr.us-east-1.amazonaws.com/courseassignment3-app'
+    }
+
+    stages {
+      stage('Cloning Git') {
+      steps {
+        checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/dev-patel27/node_docker_jenkins']]])
+      }
+    }
+
+    // Building Docker images
+    stage('Building image') {
+      steps {
+        script {
+          dockerImage = docker.build registry
+        }
+      }
+    }
+
+    // Uploading Docker images into AWS ECR
+    stage('Pushing to ECR') {
+        steps {
+            script {
+          sh 'docker login -u AWS -p $(aws ecr get-login-password --region us-east-1) 616312837040.dkr.ecr.us-east-1.amazonaws.com/courseassignment3-app '
+          sh 'docker push 616312837040.dkr.ecr.us-east-1.amazonaws.com/courseassignment3-app'
+            }
+        }
+    }
+
+    // deploy to app machine
+    stage('Docker Deploy') {
+      steps {
+        script {
+          sshagent(credentials : ['aws_ec2']) {
+                sh 'ssh -o StrictHostKeyChecking=no -i "Upgrad_Dev_SSH_Key.pem" ubuntu@44.194.10.38'
+          }
+          sh 'docker run -d -p 8081:8080 --rm --name node 616312837040.dkr.ecr.us-east-1.amazonaws.com/courseassignment3-app'
+        }
+      }
+    }
+    }
+}
