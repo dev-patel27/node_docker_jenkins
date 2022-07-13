@@ -6,12 +6,12 @@ pipeline {
         registry = '616312837040.dkr.ecr.us-east-1.amazonaws.com/courseassignment3-app'
     }
 
-    stages {
-      stage('Cloning Git') {
+  stages {
+        stage('Cloning Git') {
       steps {
-        checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/dev-patel27/node_docker_jenkins']]])
+        checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/dev-patel27/node_docker_jenkins.git']]])
       }
-    }
+        }
 
     // Building Docker images
     stage('Building image') {
@@ -43,5 +43,5 @@ pipeline {
         }
       }
     }
-    }
+  }
 }
