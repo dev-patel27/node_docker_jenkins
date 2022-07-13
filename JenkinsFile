@@ -9,7 +9,7 @@ pipeline {
   stages {
         stage('Cloning Git') {
       steps {
-        checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'git@github.com:dev-patel27/node_docker_jenkins.git']]])
+        checkout scm
       }
         }
 
